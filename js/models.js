@@ -31,7 +31,7 @@ window.MODELS = [
     id: "fsu-175-clicker",
     name: "FSU 175 Clicker",
     description: "FSU-themed clicker printed in garnet PLA.",
-    image: "assets/images/fsu-175-clicker.jpg",
+    image: "assets/images/FSU_175_Clicker.jpg",
     glb: "assets/glb/fsu-175-clicker.glb",
     stls: [
       { name: "Clicker Body", path: "assets/stl/fsu-175-clicker-body.stl" },
@@ -52,7 +52,7 @@ window.MODELS = [
     id: "nfc-keychain",
     name: "NFC Keychain",
     description: "NFC-enabled keychain printed in garnet PLA.",
-    image: "assets/images/nfc-keychain.jpg",
+    image: "assets/images/NFC_Tags.jpg",
     glb: "assets/glb/nfc-keychain.glb",
     stls: [
       { name: "Fantastic Fyyran", path: "assets/stl/fantastic-fyyran.stl" },
@@ -66,23 +66,22 @@ window.MODELS = [
   },
   // ── END ───────────────────────────────────────────────────
 
-  // ── TEMPLATE: copy this block to add a model ──────────────
+  // ── Laptop Card Holder ────────────────────────────────────
+  // Per unit: 83 min print time, 28.93g PLA, no bought materials.
   {
-    id: "example-model-3",
-    name: "Example Model 3",
-    description: "A larger model with a single bought component.",
-    image: "assets/images/example-model-3.jpg",
-    glb: "assets/glb/example-model-3.glb",
+    id: "laptop-card-holder",
+    name: "Laptop Card Holder",
+    description: "Card holder that slots into a laptop.",
+    image: "assets/images/Laptop_Card_Holder.jpg",
+    glb: "assets/glb/laptop-card-holder.glb",
     stls: [
-      { name: "Main Body", path: "assets/stl/example-model-3.stl" },
+      { name: "Laptop Card Holder", path: "assets/stl/laptop-card-holder.stl" },
     ],
-    printTimeHours: 5.75,
-    plaGrams: 120,
-    boughtMaterials: [
-      { name: "Spring", cost: 1.25, quantity: 1 },
-    ],
+    printTimeHours: 1.3833,  // 83 min ÷ 60
+    plaGrams: 28.93,
+    boughtMaterials: [],
   },
-  // ── END TEMPLATE ──────────────────────────────────────────
+  // ── END ───────────────────────────────────────────────────
 
   // Paste new models below this line ↓↓↓
 

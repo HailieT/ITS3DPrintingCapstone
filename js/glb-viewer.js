@@ -99,9 +99,32 @@ class GLBViewer {
   }
 
   animate() {
-    requestAnimationFrame(() => this.animate());
+    this.rafId = requestAnimationFrame(() => this.animate());
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
+  }
+
+  // Stop rendering and free GPU resources
+  dispose() {
+    if (this.rafId) cancelAnimationFrame(this.rafId);
+    if (this.resizeObserver) this.resizeObserver.disconnect();
+    if (this.controls) this.controls.dispose();
+    if (this.model) {
+      this.model.traverse(function (child) {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach(function (m) { m.dispose(); });
+          } else {
+            child.material.dispose();
+          }
+        }
+      });
+    }
+    if (this.renderer) this.renderer.dispose();
+    this.scene = null;
+    this.camera = null;
+    this.model = null;
   }
 }
 

@@ -180,17 +180,26 @@
           var loading = document.getElementById('loading-' + model.id);
 
           if (showingPhoto) {
+            // Switch to 3D
             photo.classList.remove('active');
             canvas.classList.add('active');
             toggleBtn.style.opacity = '1';
             loading.style.display = 'block';
+            loading.textContent = 'Loading 3D…';
+            loading.style.color = '#fff';
             if (!viewers[model.id]) {
               viewers[model.id] = new window.GLBViewer(canvas, model.glb);
             }
             showingPhoto = false;
           } else {
+            // Switch back to photo — dispose 3D viewer to free resources
             photo.classList.add('active');
             canvas.classList.remove('active');
+            loading.style.display = 'none';
+            if (viewers[model.id]) {
+              viewers[model.id].dispose();
+              delete viewers[model.id];
+            }
             showingPhoto = true;
           }
         });
