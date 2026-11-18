@@ -208,7 +208,12 @@ main#model-grid {
 .result-value { color: #fff; font-weight: 600; font-size: 0.9rem; }
 .result-item:last-child .result-value { color: var(--fsu-gold); font-size: 1.05rem; }
 
-/* STL download */
+/* STL downloads */
+.stl-downloads {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 .stl-btn {
   display: flex;
   align-items: center;

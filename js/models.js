@@ -9,7 +9,9 @@
      description     — short description shown under the name
      image           — path to the photo (jpg, png, etc.)
      glb             — path to the .glb 3D file
-     stl             — path to the .stl download file
+     stls            — array of .stl download files. Each: { name, path }
+                       name = label shown on the download button
+                       path = file path, e.g. "assets/stl/my-model.stl"
      printTimeHours  — print time PER UNIT in hours (e.g. 1.5 = 1h30m)
      plaGrams        — PLA weight PER UNIT in grams
      boughtMaterials — OPTIONAL array of purchased (non-printed) parts.
@@ -31,7 +33,10 @@ window.MODELS = [
     description: "FSU-themed clicker printed in garnet PLA.",
     image: "assets/images/fsu-175-clicker.jpg",
     glb: "assets/glb/fsu-175-clicker.glb",
-    stl: "assets/stl/fsu-175-clicker.stl",
+    stls: [
+      { name: "Clicker Body", path: "assets/stl/fsu-175-clicker-body.stl" },
+      { name: "Clicker Top", path: "assets/stl/fsu-175-clicker-top.stl" },
+    ],
     printTimeHours: 0.2287,  // 2401 min ÷ 175 ÷ 60
     plaGrams: 5.94,           // 1038.94g ÷ 175
     boughtMaterials: [
@@ -49,7 +54,10 @@ window.MODELS = [
     description: "NFC-enabled keychain printed in garnet PLA.",
     image: "assets/images/nfc-keychain.jpg",
     glb: "assets/glb/nfc-keychain.glb",
-    stl: "assets/stl/nfc-keychain.stl",
+    stls: [
+      { name: "Fantastic Fyyran", path: "assets/stl/fantastic-fyyran.stl" },
+      { name: "TagTop", path: "assets/stl/tagtop.stl" },
+    ],
     printTimeHours: 0.2825,  // 1695 min ÷ 100 ÷ 60
     plaGrams: 1.1135,        // 111.35g ÷ 100
     boughtMaterials: [
@@ -65,7 +73,9 @@ window.MODELS = [
     description: "A larger model with a single bought component.",
     image: "assets/images/example-model-3.jpg",
     glb: "assets/glb/example-model-3.glb",
-    stl: "assets/stl/example-model-3.stl",
+    stls: [
+      { name: "Main Body", path: "assets/stl/example-model-3.stl" },
+    ],
     printTimeHours: 5.75,
     plaGrams: 120,
     boughtMaterials: [
