@@ -19,39 +19,44 @@
    ============================================================ */
 
 // Update this to match the actual cost of a 1kg spool of PLA
-window.PLA_COST_PER_KG = 20.00;
+window.PLA_COST_PER_KG = 25.00;
 
 window.MODELS = [
-  // ── TEMPLATE: copy this block to add a model ──────────────
+  // ── FSU 175 Clicker ───────────────────────────────────────
+  // Batch data: 175 units took 2401 min, 1038.94g filament,
+  // 1 clicker per unit from a 90-pack ($10 on Amazon).
   {
-    id: "example-model-1",
-    name: "Example Model 1",
-    description: "Short description of what this model is.",
-    image: "assets/images/example-model-1.jpg",
-    glb: "assets/glb/example-model-1.glb",
-    stl: "assets/stl/example-model-1.stl",
-    printTimeHours: 2.5,
-    plaGrams: 45,
+    id: "fsu-175-clicker",
+    name: "FSU 175 Clicker",
+    description: "FSU-themed clicker printed in garnet PLA.",
+    image: "assets/images/fsu-175-clicker.jpg",
+    glb: "assets/glb/fsu-175-clicker.glb",
+    stl: "assets/stl/fsu-175-clicker.stl",
+    printTimeHours: 0.2287,  // 2401 min ÷ 175 ÷ 60
+    plaGrams: 5.94,           // 1038.94g ÷ 175
     boughtMaterials: [
-      { name: "Magnet (6×3mm)", cost: 0.50, quantity: 2 },
-      { name: "M3 Screw", cost: 0.10, quantity: 4 },
+      { name: "Clicker (90-pack, $10)", cost: 0.1111, quantity: 1 },  // $10 ÷ 90
     ],
   },
   // ── END TEMPLATE ──────────────────────────────────────────
 
-  // ── TEMPLATE: copy this block to add a model ──────────────
+  // ── NFC Keychain ──────────────────────────────────────────
+  // Batch data: 100 units took 1695 min, 111.35g filament,
+  // 1 NFC sticker per unit from a 120-pack ($15.99).
   {
-    id: "example-model-2",
-    name: "Example Model 2",
-    description: "Another printed item with no bought materials.",
-    image: "assets/images/example-model-2.jpg",
-    glb: "assets/glb/example-model-2.glb",
-    stl: "assets/stl/example-model-2.stl",
-    printTimeHours: 1.25,
-    plaGrams: 20,
-    boughtMaterials: [],
+    id: "nfc-keychain",
+    name: "NFC Keychain",
+    description: "NFC-enabled keychain printed in garnet PLA.",
+    image: "assets/images/nfc-keychain.jpg",
+    glb: "assets/glb/nfc-keychain.glb",
+    stl: "assets/stl/nfc-keychain.stl",
+    printTimeHours: 0.2825,  // 1695 min ÷ 100 ÷ 60
+    plaGrams: 1.1135,        // 111.35g ÷ 100
+    boughtMaterials: [
+      { name: "NFC Sticker (120-pack, $15.99)", cost: 0.1333, quantity: 1 },  // $15.99 ÷ 120
+    ],
   },
-  // ── END TEMPLATE ──────────────────────────────────────────
+  // ── END ───────────────────────────────────────────────────
 
   // ── TEMPLATE: copy this block to add a model ──────────────
   {
