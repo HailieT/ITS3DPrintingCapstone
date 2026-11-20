@@ -188,7 +188,23 @@
             loading.textContent = 'Loading 3D…';
             loading.style.color = '#fff';
             if (!viewers[model.id]) {
-              viewers[model.id] = new window.GLBViewer(canvas, model.glb);
+              // Load base64 GLB data on demand via script tag (works from file://)
+              if (window.GLB_DATA && window.GLB_DATA[model.id]) {
+                // Already loaded, create viewer directly
+                viewers[model.id] = new window.GLBViewer(canvas, model.glb);
+              } else {
+                // Dynamically load the base64 data script
+                var script = document.createElement('script');
+                script.src = 'js/glb-data/' + model.id + '.js';
+                script.onload = function () {
+                  viewers[model.id] = new window.GLBViewer(canvas, model.glb);
+                };
+                script.onerror = function () {
+                  // Fallback: try loading the GLB file directly (works over HTTP)
+                  viewers[model.id] = new window.GLBViewer(canvas, model.glb);
+                };
+                document.head.appendChild(script);
+              }
             }
             showingPhoto = false;
           } else {

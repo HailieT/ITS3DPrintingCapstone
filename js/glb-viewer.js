@@ -49,10 +49,21 @@ class GLBViewer {
   }
 
   loadModel() {
-    const loader = new THREE.GLTFLoader();
     const modelId = this.canvas.id.replace('canvas-', '');
+
+    // Try base64 data first (works from file://), fall back to file path
+    if (window.GLB_DATA && window.GLB_DATA[modelId]) {
+      var dataUrl = 'data:model/gltf-binary;base64,' + window.GLB_DATA[modelId];
+      this.loadFromUrl(dataUrl, modelId);
+    } else {
+      this.loadFromUrl(this.glbPath, modelId);
+    }
+  }
+
+  loadFromUrl(url, modelId) {
+    const loader = new THREE.GLTFLoader();
     loader.load(
-      this.glbPath,
+      url,
       (gltf) => {
         this.model = gltf.scene;
 
@@ -77,7 +88,7 @@ class GLBViewer {
       },
       undefined,
       (error) => {
-        console.error('GLB load error for ' + this.glbPath, error);
+        console.error('GLB load error for ' + url, error);
         const loading = document.getElementById('loading-' + modelId);
         if (loading) {
           loading.style.display = 'block';

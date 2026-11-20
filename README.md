@@ -81,3 +81,27 @@ ITS3DPrintingCapstone/
 
 - An internet connection is required on first load to fetch Three.js from the CDN (used for the 3D viewer). After that it may be cached by the browser.
 - The photo placeholder comes from placehold.co if the image file is missing.
+- GLB 3D model data is embedded as base64 in `js/glb-data/` so the 3D viewer works when opening the HTML file directly (no server needed). The data loads on demand only when you click the toggle arrow.
+
+## Regenerating GLB Data
+
+If you replace or add a `.glb` file in `assets/glb/`, regenerate the base64 data files:
+
+```bash
+python3 -c "
+import base64, os
+mapping = {
+    'FSU175Clicker.glb': 'fsu-175-clicker',
+    'NFCTag.glb': 'nfc-keychain',
+    'LaptopCardHolder.glb': 'laptop-card-holder',
+}
+os.makedirs('js/glb-data', exist_ok=True)
+for filename, model_id in mapping.items():
+    with open('assets/glb/' + filename, 'rb') as f:
+        data = base64.b64encode(f.read()).decode('ascii')
+    with open('js/glb-data/' + model_id + '.js', 'w') as f:
+        f.write('window.GLB_DATA = window.GLB_DATA || {};\n')
+        f.write('window.GLB_DATA[\"' + model_id + '\"] = \"' + data + '\";\n')
+    print(model_id + ' done')
+"
+```
