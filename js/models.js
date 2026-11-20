@@ -32,7 +32,7 @@ window.MODELS = [
     name: "FSU 175 Clicker",
     description: "FSU-themed clicker printed in garnet PLA.",
     image: "assets/images/FSU_175_Clicker.jpg",
-    glb: "assets/glb/fsu-175-clicker.glb",
+    glb: "assets/glb/FSU175Clicker.glb",
     stls: [
       { name: "Clicker Body", path: "assets/stl/fsu-175-clicker-body.stl" },
       { name: "Clicker Top", path: "assets/stl/fsu-175-clicker-top.stl" },
@@ -53,7 +53,7 @@ window.MODELS = [
     name: "NFC Keychain",
     description: "NFC-enabled keychain printed in garnet PLA.",
     image: "assets/images/NFC_Tags.jpg",
-    glb: "assets/glb/nfc-keychain.glb",
+    glb: "assets/glb/NFCTag.glb",
     stls: [
       { name: "Fantastic Fyyran", path: "assets/stl/fantastic-fyyran.stl" },
       { name: "TagTop", path: "assets/stl/tagtop.stl" },
@@ -73,7 +73,7 @@ window.MODELS = [
     name: "Laptop Card Holder",
     description: "Card holder that slots into a laptop.",
     image: "assets/images/Laptop_Card_Holder.jpg",
-    glb: "assets/glb/laptop-card-holder.glb",
+    glb: "assets/glb/LaptopCardHolder.glb",
     stls: [
       { name: "Laptop Card Holder", path: "assets/stl/laptop-card-holder.stl" },
     ],
