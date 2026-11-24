@@ -128,8 +128,110 @@
               '</a>';
             }).join('') +
           '</div>' +
+
+          '<button type="button" class="add-cart-btn" data-model-id="' + model.id + '">' +
+            'Add to Cart' +
+          '</button>' +
         '</div>' +
       '</article>';
+  }
+
+  // ── Cart ────────────────────────────────────────────────
+  var CART_KEY = 'its3d-cart';
+  var cart = loadCart(); // [{ id, qty }]
+
+  function loadCart() {
+    try {
+      var saved = JSON.parse(localStorage.getItem(CART_KEY));
+      if (!Array.isArray(saved)) return [];
+      return saved.filter(function (item) {
+        return item && findModel(item.id) && item.qty >= 1;
+      });
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveCart() {
+    try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (e) { /* storage unavailable */ }
+  }
+
+  function findModel(id) {
+    for (var i = 0; i < MODELS.length; i++) {
+      if (MODELS[i].id === id) return MODELS[i];
+    }
+    return null;
+  }
+
+  function addToCart(id, qty) {
+    qty = parseInt(qty, 10);
+    if (isNaN(qty) || qty < 1) qty = 1;
+    var existing = cart.filter(function (item) { return item.id === id; })[0];
+    if (existing) existing.qty += qty;
+    else cart.push({ id: id, qty: qty });
+    saveCart();
+    renderCart();
+  }
+
+  function removeFromCart(id) {
+    cart = cart.filter(function (item) { return item.id !== id; });
+    saveCart();
+    renderCart();
+  }
+
+  function renderCart() {
+    var count = cart.reduce(function (sum, item) { return sum + item.qty; }, 0);
+    document.getElementById('cart-count').textContent = count;
+
+    var body = document.getElementById('cart-items');
+    var totals = document.getElementById('cart-totals');
+    body.textContent = '';
+
+    if (cart.length === 0) {
+      var empty = document.createElement('p');
+      empty.className = 'cart-empty';
+      empty.textContent = 'Your cart is empty.';
+      body.appendChild(empty);
+      totals.textContent = '';
+      return;
+    }
+
+    var totalTime = 0, totalPla = 0, totalCost = 0;
+
+    cart.forEach(function (item) {
+      var model = findModel(item.id);
+      var time = model.printTimeHours * item.qty;
+      var pla = model.plaGrams * item.qty;
+      var cost = unitCost(model) * item.qty;
+      totalTime += time;
+      totalPla += pla;
+      totalCost += cost;
+
+      var row = document.createElement('div');
+      row.className = 'cart-item';
+
+      var info = document.createElement('div');
+      var name = document.createElement('strong');
+      name.textContent = model.name + ' × ' + item.qty;
+      var detail = document.createElement('span');
+      detail.className = 'cart-item-detail';
+      detail.textContent = formatTime(time) + ' · ' + pla.toFixed(1) + ' g PLA · ' + formatMoney(cost);
+      info.appendChild(name);
+      info.appendChild(detail);
+
+      var remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'cart-remove';
+      remove.textContent = 'Remove';
+      remove.addEventListener('click', function () { removeFromCart(item.id); });
+
+      row.appendChild(info);
+      row.appendChild(remove);
+      body.appendChild(row);
+    });
+
+    totals.textContent =
+      'Total: ' + formatTime(totalTime) + ' · ' + totalPla.toFixed(1) + ' g PLA · ' + formatMoney(totalCost);
   }
 
   function updateResults(model, qty) {
@@ -159,6 +261,15 @@
           '<div class="global-info">PLA cost: ' + formatMoney(PLA_COST_PER_KG) + ' / kg</div>' +
         '</div>' +
       '</header>' +
+      '<button type="button" id="cart-toggle" class="cart-toggle" aria-label="Open cart">' +
+        '<span class="cart-icon"><img src="assets/images/basket.png" alt=""></span>' +
+        '<span id="cart-count" class="cart-badge">0</span>' +
+      '</button>' +
+      '<aside id="cart-panel" class="cart-panel" hidden>' +
+        '<h2>Your Cart</h2>' +
+        '<div id="cart-items"></div>' +
+        '<div id="cart-totals" class="cart-totals"></div>' +
+      '</aside>' +
       '<main id="model-grid"></main>' +
       '<footer><p>FSU ITS — Internal Tool</p></footer>';
 
@@ -166,6 +277,21 @@
     grid.innerHTML = MODELS.map(renderModel).join('');
 
     var viewers = {};
+
+    var cartPanel = document.getElementById('cart-panel');
+    document.getElementById('cart-toggle').addEventListener('click', function () {
+      cartPanel.hidden = !cartPanel.hidden;
+    });
+    grid.addEventListener('click', function (e) {
+      var btn = e.target.closest('.add-cart-btn');
+      if (!btn) return;
+      var id = btn.getAttribute('data-model-id');
+      var qtyInput = document.getElementById('qty-' + id);
+      addToCart(id, qtyInput ? qtyInput.value : 1);
+      btn.textContent = 'Added ✓';
+      setTimeout(function () { btn.textContent = 'Add to Cart'; }, 1000);
+    });
+    renderCart();
 
     MODELS.forEach(function (model) {
       // Toggle button
