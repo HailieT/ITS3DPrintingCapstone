@@ -55,13 +55,15 @@
         '<div class="model-visual" data-model-id="' + model.id + '">' +
           '<img src="' + model.image + '" alt="' + model.name + '" class="model-photo active" ' +
             'onerror="this.src=\'https://placehold.co/400x300?text=No+Photo\';">' +
-          '<canvas class="model-glb" id="canvas-' + model.id + '"></canvas>' +
-          '<button class="toggle-view" data-model-id="' + model.id + '" title="Switch view">' +
-            '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+          '<canvas class="model-glb" id="canvas-' + model.id + '" role="img" ' +
+            'aria-label="Interactive 3D view of ' + model.name + '. Drag to rotate."></canvas>' +
+          '<button type="button" class="toggle-view" data-model-id="' + model.id + '" ' +
+            'title="Switch between photo and 3D view" aria-label="Switch between photo and 3D view of ' + model.name + '" aria-pressed="false">' +
+            '<svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
               '<path d="M5 12h14M12 5l7 7-7 7"/>' +
             '</svg>' +
           '</button>' +
-          '<div class="glb-loading" id="loading-' + model.id + '" style="display:none;">Loading 3D…</div>' +
+          '<div class="glb-loading" id="loading-' + model.id + '" role="status" style="display:none;">Loading 3D…</div>' +
         '</div>' +
 
         '<div class="model-info">' +
@@ -130,7 +132,7 @@
           '</div>' +
 
           '<button type="button" class="add-cart-btn" data-model-id="' + model.id + '">' +
-            'Add to Cart' +
+            '<span class="btn-label">Add to Cart</span><span class="sr-only"> ' + model.name + '</span>' +
           '</button>' +
         '</div>' +
       '</article>';
@@ -171,17 +173,29 @@
     else cart.push({ id: id, qty: qty });
     saveCart();
     renderCart();
+    return { qty: qty, name: findModel(id).name };
   }
 
   function removeFromCart(id) {
     cart = cart.filter(function (item) { return item.id !== id; });
     saveCart();
     renderCart();
+    announce('Removed from cart.');
+  }
+
+  // Screen reader announcements (aria-live region)
+  function announce(message) {
+    var el = document.getElementById('sr-status');
+    if (!el) return;
+    el.textContent = '';
+    setTimeout(function () { el.textContent = message; }, 50);
   }
 
   function renderCart() {
     var count = cart.reduce(function (sum, item) { return sum + item.qty; }, 0);
     document.getElementById('cart-count').textContent = count;
+    document.getElementById('cart-toggle').setAttribute(
+      'aria-label', 'Cart, ' + count + (count === 1 ? ' item' : ' items'));
 
     var body = document.getElementById('cart-items');
     var totals = document.getElementById('cart-totals');
@@ -223,6 +237,7 @@
       remove.type = 'button';
       remove.className = 'cart-remove';
       remove.textContent = 'Remove';
+      remove.setAttribute('aria-label', 'Remove ' + model.name + ' from cart');
       remove.addEventListener('click', function () { removeFromCart(item.id); });
 
       row.appendChild(info);
@@ -251,27 +266,94 @@
     if (costEl) costEl.textContent = formatMoney(totalCost);
   }
 
+  // ── Layout photos (configured in js/layout-images.js) ───
+  var LAYOUT = window.LAYOUT_IMAGES || {};
+
+  function escAttr(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function photoHtml(item, cls) {
+    if (!item || !item.src) {
+      return '<div class="photo-placeholder ' + cls + '" aria-hidden="true">Photo</div>';
+    }
+    return '<img class="layout-photo ' + cls + '" src="' + escAttr(item.src) + '" alt="' +
+      escAttr(item.alt || '') + '" onerror="this.style.display=\'none\'">';
+  }
+
+  function railHtml(items, side) {
+    return '<div class="side-rail side-rail-' + side + '">' +
+      (items || []).map(function (it) { return photoHtml(it, 'side-photo'); }).join('') +
+    '</div>';
+  }
+
   function init() {
     // Header
     app.innerHTML =
-      '<header>' +
+      '<a class="skip-link" href="#model-grid">Skip to models</a>' +
+      '<nav class="top-bar" aria-label="Main">' +
+        '<div class="top-bar-inner">' +
+          '<a class="brand" href="#top">' +
+            '<span class="brand-fsu">FSU</span>' +
+            '<span class="brand-divider"></span>' +
+            '<span class="brand-its">Information Technology Services</span>' +
+          '</a>' +
+          '<ul class="nav-links">' +
+            '<li><a href="#model-grid">Models</a></li>' +
+          '</ul>' +
+        '</div>' +
+      '</nav>' +
+      '<header id="top">' +
         '<div class="header-inner">' +
           '<h1>FSU ITS 3D Printing Calculator</h1>' +
           '<p class="subtitle">Select a model, enter quantity, and get print time, material usage, and cost.</p>' +
           '<div class="global-info">PLA cost: ' + formatMoney(PLA_COST_PER_KG) + ' / kg</div>' +
         '</div>' +
       '</header>' +
-      '<button type="button" id="cart-toggle" class="cart-toggle" aria-label="Open cart">' +
+      '<button type="button" id="cart-toggle" class="cart-toggle" aria-label="Cart, 0 items" ' +
+        'aria-expanded="false" aria-controls="cart-panel">' +
         '<span class="cart-icon"><img src="assets/images/basket.png" alt=""></span>' +
-        '<span id="cart-count" class="cart-badge">0</span>' +
+        '<span id="cart-count" class="cart-badge" aria-hidden="true">0</span>' +
       '</button>' +
-      '<aside id="cart-panel" class="cart-panel" hidden>' +
-        '<h2>Your Cart</h2>' +
+      '<aside id="cart-panel" class="cart-panel" aria-labelledby="cart-title" hidden>' +
+        '<h2 id="cart-title">Your Cart</h2>' +
         '<div id="cart-items"></div>' +
         '<div id="cart-totals" class="cart-totals"></div>' +
       '</aside>' +
-      '<main id="model-grid"></main>' +
-      '<footer><p>FSU ITS — Internal Tool</p></footer>';
+      '<div id="sr-status" class="sr-only" role="status" aria-live="polite"></div>' +
+      '<div class="page-layout">' +
+        railHtml(LAYOUT.left, 'left') +
+        '<main id="model-grid" tabindex="-1"></main>' +
+        railHtml(LAYOUT.right, 'right') +
+      '</div>' +
+      '<footer>' +
+        '<div class="footer-inner">' +
+          '<div class="footer-col">' +
+            '<h3>FSU ITS 3D Printing</h3>' +
+            '<p>Browse printable models, check print time and material usage, and build a request.</p>' +
+          '</div>' +
+          '<div class="footer-col">' +
+            '<h3>Quick Links</h3>' +
+            '<ul>' +
+              '<li><a href="#top">Back to top</a></li>' +
+              '<li><a href="#model-grid">Models</a></li>' +
+            '</ul>' +
+          '</div>' +
+          '<div class="footer-col">' +
+            '<h3>About</h3>' +
+            '<p>Internal ITS tool. Capstone project.</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="footer-bottom">&copy; ' + new Date().getFullYear() + ' Florida State University ITS. Internal use only.</div>' +
+      '</footer>';
+
+    // Banner photo becomes the header background (with a garnet overlay so text stays readable)
+    if (LAYOUT.banner && LAYOUT.banner.src) {
+      var headerEl = document.getElementById('top');
+      headerEl.style.backgroundImage =
+        'linear-gradient(rgba(61,26,34,0.7), rgba(61,26,34,0.7)), url("' + encodeURI(LAYOUT.banner.src) + '")';
+      headerEl.classList.add('has-photo');
+    }
 
     var grid = document.getElementById('model-grid');
     grid.innerHTML = MODELS.map(renderModel).join('');
@@ -279,17 +361,30 @@
     var viewers = {};
 
     var cartPanel = document.getElementById('cart-panel');
-    document.getElementById('cart-toggle').addEventListener('click', function () {
-      cartPanel.hidden = !cartPanel.hidden;
+    var cartToggle = document.getElementById('cart-toggle');
+    function setCartOpen(open) {
+      cartPanel.hidden = !open;
+      cartToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    cartToggle.addEventListener('click', function () {
+      setCartOpen(cartPanel.hidden);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !cartPanel.hidden) {
+        setCartOpen(false);
+        cartToggle.focus();
+      }
     });
     grid.addEventListener('click', function (e) {
       var btn = e.target.closest('.add-cart-btn');
       if (!btn) return;
       var id = btn.getAttribute('data-model-id');
       var qtyInput = document.getElementById('qty-' + id);
-      addToCart(id, qtyInput ? qtyInput.value : 1);
-      btn.textContent = 'Added ✓';
-      setTimeout(function () { btn.textContent = 'Add to Cart'; }, 1000);
+      var added = addToCart(id, qtyInput ? qtyInput.value : 1);
+      var label = btn.querySelector('.btn-label');
+      label.textContent = 'Added ✓';
+      setTimeout(function () { label.textContent = 'Add to Cart'; }, 1000);
+      announce('Added ' + added.qty + ' × ' + added.name + ' to cart.');
     });
     renderCart();
 
@@ -332,6 +427,7 @@
                 document.head.appendChild(script);
               }
             }
+            toggleBtn.setAttribute('aria-pressed', 'true');
             showingPhoto = false;
           } else {
             // Switch back to photo — dispose 3D viewer to free resources
@@ -342,6 +438,7 @@
               viewers[model.id].dispose();
               delete viewers[model.id];
             }
+            toggleBtn.setAttribute('aria-pressed', 'false');
             showingPhoto = true;
           }
         });

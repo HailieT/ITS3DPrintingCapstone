@@ -32,8 +32,13 @@ class GLBViewer {
     this.controls = new THREE.OrbitControls(this.camera, canvas);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.1;
-    this.controls.autoRotate = true;
+    // Don't auto-spin for users who asked for reduced motion
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.controls.autoRotate = !reduceMotion;
     this.controls.autoRotateSpeed = 1.0;
+    // OrbitControls sets touch-action:none, which traps page scrolling on touch screens.
+    // pan-y lets vertical swipes scroll the page; horizontal drags still rotate the model.
+    canvas.style.touchAction = 'pan-y';
 
     // Load model
     this.model = null;
